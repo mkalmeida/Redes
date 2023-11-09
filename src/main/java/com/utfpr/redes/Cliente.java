@@ -1,4 +1,4 @@
-package com.utfpr;
+package com.utfpr.redes;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
