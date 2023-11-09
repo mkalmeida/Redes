@@ -12,26 +12,30 @@ public class Cliente {
     private static DataInputStream entrada;
     private static DataOutputStream saida;
 
-    public static void main (String args[]) {
+    public static void main(String args[]) {
         Scanner scanner = new Scanner(System.in);
         try {
-        // conectar ao servidor
-        conexao = new Socket("127.0.0.1", 50000);
+            // Conectar ao servidor
+            conexao = new Socket("127.0.0.1", 50000);
 
-        // enviar cpf
-        saida = new DataOutputStream(conexao.getOutputStream());
-        String cpf = scanner.nextLine();
-        saida.writeUTF(cpf);
+            // Informar ao usuário para digitar o CPF
+            System.out.println("Por favor, digite o CPF e pressione Enter:");
+            
+            // Enviar CPF
+            saida = new DataOutputStream(conexao.getOutputStream());
+            String cpf = scanner.nextLine();
+            saida.writeUTF(cpf);
 
-        // receber resposta do servidor
-        entrada = new DataInputStream(conexao.getInputStream());
-        String resposta = entrada.readUTF();
-        System.out.println("Resposta do servidor: " + resposta);
-        // fechar conexao
-        conexao.close();
+            // Receber resposta do servidor
+            entrada = new DataInputStream(conexao.getInputStream());
+            String resposta = entrada.readUTF();
+            System.out.println("Resposta do servidor: " + resposta);
+
+            // Fechar conexão
+            conexao.close();
         } catch (IOException e) {
-			e.printStackTrace();
-		}
+            e.printStackTrace();
+        }
     }
-    
 }
+

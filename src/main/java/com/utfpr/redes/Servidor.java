@@ -10,98 +10,69 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Servidor {
+    private static ServerSocket servidor;
+    private static Socket conexao;
 
-	private static ServerSocket servidor;
-	private static Socket conexao;
-	private static DataInputStream entrada;
-	private static DataOutputStream saida;
+    public static void main(String[] args) {
+        try {
+            servidor = new ServerSocket(50000);
+            conexao = servidor.accept();
+            System.out.println("Cliente conectou");
 
-	public static void main(String[] args) {
-
-		try {
-			//especificar porta e aguardar conexão
-			servidor = new ServerSocket(50000);
-			conexao = servidor.accept();
-			System.out.println("Cliente conectou");
-
-			//receber dados do cliente
-			String cpf;
-
-			InputStream input = conexao.getInputStream();
-			BufferedReader entrada = new BufferedReader(new InputStreamReader(input));
+            String cpf;
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(conexao.getInputStream()));
             cpf = entrada.readLine();
-			
-			//realiza verificação do cpf
 
-			//transformando cpf em array para poder percorrer os números
-			char[] cpfArray = cpf.toCharArray();
-			int soma=0;
-			double div=0.0, modulo =0.0;
-			int multiplicador=2, multiplic=2;
-			int penultimoNumero=0, ultimoNumero=0;
-			//pegando o último número
-			if (cpfArray.length == 10){
-	
-				for (int i=8; i>0; i--){
-					soma=soma + cpfArray[i]*multiplicador;
-					multiplicador++;
-				}
+            if (verificarCPF(cpf)) {
+                System.out.println("CPF válido");
+            } else {
+                System.out.println("CPF inválido");
+            }
 
-				div = (soma/11);
+            DataOutputStream saida = new DataOutputStream(conexao.getOutputStream());
+            saida.writeUTF(cpf);
 
-				if((int)div == 0 || (int)div == 1){
-					cpfArray[9] = 0;
-				} else {
-					modulo = (soma%11)*11;
-					int moduloArredondado = (int) Math.round(modulo);
-					penultimoNumero = 11 - moduloArredondado;
-				}
+            conexao.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-				StringBuilder dezDigitos = new StringBuilder();
+    public static boolean verificarCPF(String cpf) {
+        if (cpf.length() != 11) {
+            return false; // CPF deve ter 11 dígitos
+        }
 
-				for (int i=0; i < 8; i++){
-					dezDigitos.append(cpfArray[i]);
-				}
-				dezDigitos.append(penultimoNumero);
+        int[] cpfArray = new int[11];
+        for (int i = 0; i < 11; i++) {
+            cpfArray[i] = Integer.parseInt(cpf.substring(i, i + 1));
+        }
 
-				for (int i=9; i>0; i--){
-					soma=soma + dezDigitos.charAt(i);
-					multiplic++;
-				}
-				
-				div = (soma/11);
+        int primeiroDigito = calcularPrimeiroDigitoVerificador(cpfArray);
+        int segundoDigito = calcularSegundoDigitoVerificador(cpfArray, primeiroDigito);
 
-				if((int)div == 0 || (int)div == 1){
-					cpfArray[9] = 0;
-				} else {
-					modulo = (soma%11)*11;
-					int moduloArredondado = (int) Math.round(modulo);
-					ultimoNumero = 11 - moduloArredondado;
-				}
+        return cpfArray[9] == primeiroDigito && cpfArray[10] == segundoDigito;
+    }
 
-				if(penultimoNumero >=0 && ultimoNumero >=0){
-					System.out.println("CPF válido");
-				} else {
-					System.out.println("CPF inválido");
-				}
-				
+    public static int calcularPrimeiroDigitoVerificador(int[] cpfArray) {
+        int soma = 0;
+        int multiplicador = 2;
+        for (int i = 8; i >= 0; i--) {
+            soma += cpfArray[i] * multiplicador;
+            multiplicador++;
+        }
+        int resto = soma % 11;
+        return (resto < 2) ? 0 : 11 - resto;
+    }
 
-
-			} else {
-				System.out.println("CPF inválido");
-			}
-			
-			//retorna dados do cliente
-			saida = new DataOutputStream((conexao.getOutputStream()));
-			saida.writeUTF(cpf);
-	
-			//fecha conexão
-			conexao.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-
-	}
-
+    public static int calcularSegundoDigitoVerificador(int[] cpfArray, int primeiroDigito) {
+        int soma = 0;
+        int multiplicador = 2;
+        for (int i = 9; i >= 0; i--) {
+            soma += cpfArray[i] * multiplicador;
+            multiplicador++;
+        }
+        int resto = soma % 11;
+        return (resto < 2) ? 0 : 11 - resto;
+    }
 }
