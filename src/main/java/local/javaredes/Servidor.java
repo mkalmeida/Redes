@@ -31,10 +31,10 @@ public class Servidor {
             entrada = new DataInputStream(input);
             String cpf = entrada.readUTF();
 
-            // Realizar a verificação do valor
+            // Realizar a verificação do cpf
             String resultado = "";
             if (cpf.length() != 11) {
-                resultado = "CPF inválido"; // CPF deve ter 11 dígitos
+                resultado = "CPF inválido"; 
             } else {
 
                 int[] cpfArray = new int[11];
