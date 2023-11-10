@@ -1,4 +1,10 @@
-package com.utfpr.redes;
+/**
+ * 
+ *  @author Michaella Almeida
+ * 
+ */
+
+package local.javaredes;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -13,29 +19,31 @@ public class Cliente {
     private static DataOutputStream saida;
 
     public static void main(String args[]) {
-        Scanner scanner = new Scanner(System.in);
+
         try {
-            // Conectar ao servidor
+            // Connect to the server
             conexao = new Socket("127.0.0.1", 50000);
 
-            // Informar ao usuário para digitar o CPF
-            System.out.println("Por favor, digite o CPF e pressione Enter:");
-            
-            // Enviar CPF
-            saida = new DataOutputStream(conexao.getOutputStream());
+            // Get user input from the terminal
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Digite um número: ");
             String cpf = scanner.nextLine();
+
+            // Send the number to the server
+            saida = new DataOutputStream(conexao.getOutputStream());
             saida.writeUTF(cpf);
 
-            // Receber resposta do servidor
+            // Receive the server's response
             entrada = new DataInputStream(conexao.getInputStream());
             String resposta = entrada.readUTF();
             System.out.println("Resposta do servidor: " + resposta);
 
-            // Fechar conexão
+            // Close the connection
             conexao.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 }
+
 
